@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hermes</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <style>
+      .form-item {
+        margin: 20px;
+      }
+      input[type="text"] {
+        width: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div class="form-item">
+        <label for="cookie1">cookie1:</label>
+        <input type="text" id="cookie1" name="cookie1" v-model="cookie1" />
+      </div>
+
+      <div class="form-item">
+        <label for="cookie2">cookie2:</label>
+        <input type="text" id="cookie2" name="cookie2" v-model="cookie2" />
+      </div>
+
+      <div class="form-item">
+        <label for="cookie3">cookie3:</label>
+        <input type="text" id="cookie3" name="cookie3" v-model="cookie3" />
+      </div>
+
+      <br />
+
+      <div class="form-item">
+        <label for="product1">产品编号1:</label>
+        <input type="text" id="product1" name="product1" v-model="product1" />
+      </div>
+
+      <div class="form-item">
+        <label for="product2">产品编号2:</label>
+        <input type="text" id="product2" name="product2" v-model="product2" />
+      </div>
+      <div class="form-item">
+        <input type="checkbox" id="nl_en" name="nl_en" value="nl_en" />
+        <label for="nl_en"> 荷兰</label><br />
+        <input type="checkbox" id="cn_zh" name="cn_zh" value="cn_zh" />
+        <label for="cn_zh"> 中国</label><br />
+        <input type="checkbox" id="uk_en" name="uk_en" value="uk_en" />
+        <label for="uk_en">英国</label><br />
+        <input type="checkbox" id="it_it" name="it_it" value="it_it" />
+        <label for="it_it"> 意大利</label><br />
+        <input type="checkbox" id="de_de" name="de_de" value="de_de" />
+        <label for="de_de"> 德国</label><br />
+        <input type="checkbox" id="fr_fr" name="fr_fr" value="fr_fr" />
+        <label for="fr_fr"> 法国</label><br />
+        <input type="checkbox" id="us_en" name="us_en" value="us_en" />
+        <label for="us_en"> 美国</label><br />
+        <input type="checkbox" id="ca_en" name="ca_en" value="ca_en" />
+        <label for="ca_en"> 加拿大</label><br />
+        <input type="checkbox" id="au_en" name="au_en" value="au_en" />
+        <label for="au_en"> 澳大利亚</label><br />
+      </div>
+      <button v-on:click="onSubmit">加入购物车</button>
+    </div>
+
+    <br>
+    <div id="result"></div>
+  </body>
+
+  <script>
+    var app = new Vue({
+      el: "#app",
+      data: {
+        cookie1: "",
+        cookie2: "",
+        cookie3: "",
+        product1: "",
+        product2: "",
+      },
+      methods: {
+        setCookies: (ev) => {
+          try {
+            let elements = document.querySelectorAll("input[name*=cookie]"),
+              cookies = [];
+
+            elements.forEach((el) => {
+              if (el.value) {
+                cookies.push(el.value);
+              }
+            });
+            window.localStorage.setItem("mycookies", JSON.stringify(cookies));
+          } catch (error) {
+            alert(error);
+          }
+        },
+        onSubmit: (ev) => {
+          ev.stopPropagation();
+          ev.preventDefault();
+          document.getElementById("result").innerHTML = ""
+          let cookieEles = document.querySelectorAll("input[name*=cookie]"),
+            productEles = document.querySelectorAll("input[name*=product]"),
+            countryEles = document.querySelectorAll("input[type=checkbox]"),
+            products = [],
+            countries = [],
+            cookies = [];
+
+          cookieEles.forEach((el) => {
+            if (el.value) {
+              cookies.push(el.value);
+            }
+          });
+          productEles.forEach((el) => {
+            if (el.value) {
+              products.push(el.value);
+            }
+          });
+
+          countryEles.forEach((ele) => {
+            if (ele.checked) {
+              countries.push(ele.value);
+            }
+          });
+          axios
+            .post("/add-to-cart", {
+              cookies,
+              products,
+              countries,
+            })
+            .then((res) => {
+              console.log(res);
+              document.getElementById("result").innerHTML =
+                res.data.result || res.data.error;
+            })
+            .catch((error) => {
+              document.getElementById("result").innerHTML = error;
+            });
+        },
+      },
+    });
+  </script>
+
+  <script>
+
+    // H056289CC37，H056289CC18，H056289CK18，H056289CKI2，H056289CC8F，H056289CC08，H056289CC10，H056289CCW0，H056289CC8L，H056289CC01，H056289CCQ1，H069560CKAR，H073597CC37，H073597CC3I，H073597CCD0，H073597CCM8，H073597CK3I，H075208CKAK，H077913CC34，H076293CKAJ，H056289CK37，H056289CK10
+    axios.get("https://bck.hermes.cn/product-page?locale=nl_en&productsku=H056289CC37")
+    .then(res => {
+      console.log(res);
+    })
+  </script>
+</html>
