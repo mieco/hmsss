@@ -2,8 +2,10 @@ const express = require("express");
 const path = require("path");
 const app = express();
 var bodyParser = require("body-parser");
-const request = require("request-promise");
+const request = require("request");
 const userAgents = require("./userAgent");
+
+const rp = request.defaults({ proxy: "http://180.141.90.145:53281" });
 // rey.RqLU8exfsfA
 app.use(express.static(path.join(__dirname)));
 var jsonParser = bodyParser.json();
@@ -14,7 +16,8 @@ app.get("/", (req, res) => {
 
 app.post("/add-to-cart", jsonParser, (req, res) => {
   const { cookies = [], products = [], countries = [] } = req.body,
-    all_req = [],cookiemap={};
+    all_req = [],
+    cookiemap = {};
 
   if (products.length === 0) {
     return res.json({ error: "没有产品编号" });
@@ -25,11 +28,10 @@ app.post("/add-to-cart", jsonParser, (req, res) => {
   if (countries.length === 0) {
     return res.json({ error: "没有设置城市" });
   }
-  
 
-  cookies.forEach((cookie,idx) => {
-    if(cookie) {
-      cookiemap[cookie+";"] = "账号" + (idx + 1)
+  cookies.forEach((cookie, idx) => {
+    if (cookie) {
+      cookiemap[cookie + ";"] = "账号" + (idx + 1);
     }
     products.forEach((prod) => {
       countries.forEach((country) => {
@@ -47,47 +49,62 @@ app.post("/add-to-cart", jsonParser, (req, res) => {
       let userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
       // let userAgent = userAgents[8];
 
-      return request.post("https://bck.hermes.cn/add-to-cart", {
-        headers: {
-          Cookie: `ECOM_SESS=${item.cookie};`,
-          "user-agent":userAgent,
-        },
-        body: {
-          locale: item.country,
-          items: [
-            {
-              category: "direct",
-              sku: item.prod,
+      return new Promise((resolve, reject) => {
+        // rp.get(
+        rp.post(
+          "https://bck.hermes.cn/add-to-cart",
+          {
+            headers: {
+              Cookie: `ECOM_SESS=${item.cookie};`,
+              "user-agent": userAgent,
             },
-          ],
-        },
-        json: true,
-        transform: function (body, response) {
-          return {
-            rr: body,
-            response,
-          };
-        },
+            body: {
+              locale: item.country,
+              items: [
+                {
+                  category: "direct",
+                  sku: item.prod,
+                },
+              ],
+            },
+            json: true,
+            tunnel:false
+          },
+          (err, res) => {
+            console.log(res);
+            if (err) {
+              reject(err);
+            } else {
+              resolve({
+                rr:res.body,
+                response:res
+              });
+            }
+          }
+        );
       });
     })
   )
     .then((r) => {
-      let reshtml = ``,success_str = "",error_str = "";
+      let reshtml = ``,
+        success_str = "",
+        error_str = "";
       r.forEach(({ rr, response }) => {
+        console.log(rr);
         if (rr.error) {
           error_str += `<span style="color:#D84315;">加入失败！</span><strong>${
-            cookiemap[response.request.headers.Cookie.split("=")[1]] || response.request.headers.Cookie.split("=")[1]
+            cookiemap[response.request.headers.Cookie.split("=")[1]] ||
+            response.request.headers.Cookie.split("=")[1]
           }</strong> : <strong> ${
             rr.error.item
-          }</strong>  <span style="color:#D84315;">${
-            rr.error.message
-          } ${rr.error.code}</span><br>`;
+          }</strong>  <span style="color:#D84315;">${rr.error.message} ${
+            rr.error.code
+          }</span><br>`;
         } else {
           success_str += `<span style="color:#00E676;">加入成功！</span><strong>${
-            cookiemap[response.request.headers.Cookie.split("=")[1]] || response.request.headers.Cookie.split("=")[1]
-          }</strong> : <strong>${
-            rr.basket.items[0].sku
-          }</strong> <br>`;
+            cookiemap[response.request.headers.Cookie.split("=")[1]] ||
+            response.request.headers.Cookie.split("=")[1]
+          }</strong> : <strong>${rr.basket.items[0].sku}</strong> <br>`;
         }
       });
 
@@ -97,7 +114,7 @@ app.post("/add-to-cart", jsonParser, (req, res) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      // console.log(err);
       res.json({
         error: err.message,
       });
