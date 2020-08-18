@@ -6,70 +6,115 @@
     <title>Hermes</title>
 
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="./axios.js"></script>
 
     <style>
       .form-item {
-        margin: 20px;
+        margin-left: 30px;
       }
       input[type="text"] {
         width: 300px;
+        margin-bottom: 30px;
+      }
+      label {
+        display: inline-block;
+        width: 100px;
+      }
+
+      textarea {
+        width: 300px;
+        margin-bottom: 30px;
+      }
+
+      #app {
+        display: flex;
+      }
+
+      button {
+        margin-left: 30px;
+        margin-top: 30px;
       }
     </style>
   </head>
   <body>
     <div id="app">
-      <div class="form-item">
-        <label for="cookie1">cookie1:</label>
-        <input type="text" id="cookie1" name="cookie1" v-model="cookie1" />
-      </div>
+      <div>
+        <div class="form-item">
+          <br />
+          <label for="cookie1">cookie:</label>
+          <br />
+          <input type="text" id="cookie1" name="cookie1" v-model="cookie1" />
+          <br />
+          <label for="datadome">datadome:</label>
+          <br />
+          <textarea
+            name="datadome"
+            id="datadome"
+            cols="30"
+            rows="5"
+            v-model="datadome"
+          ></textarea>
+        </div>
 
-      <div class="form-item">
-        <label for="cookie2">cookie2:</label>
-        <input type="text" id="cookie2" name="cookie2" v-model="cookie2" />
-      </div>
+        <!-- <div class="form-item">
+          <label for="cookie2">cookie2:</label>
+          <input type="text" id="cookie2" name="cookie2" v-model="cookie2" />
+        </div>
 
-      <div class="form-item">
-        <label for="cookie3">cookie3:</label>
-        <input type="text" id="cookie3" name="cookie3" v-model="cookie3" />
-      </div>
+        <div class="form-item">
+          <label for="cookie3">cookie3:</label>
+          <input type="text" id="cookie3" name="cookie3" v-model="cookie3" />
+        </div> -->
 
-      <br />
+        <br />
 
-      <div class="form-item">
-        <label for="product1">产品编号1:</label>
-        <input type="text" id="product1" name="product1" v-model="product1" />
-      </div>
+        <div class="form-item">
+          <label for="product1">产品编号1:</label>
+          <input type="text" id="product1" name="product1" v-model="product1" />
+        </div>
 
-      <div class="form-item">
-        <label for="product2">产品编号2:</label>
-        <input type="text" id="product2" name="product2" v-model="product2" />
+        <div class="form-item">
+          <label for="product2">产品编号2:</label>
+          <input type="text" id="product2" name="product2" v-model="product2" />
+        </div>
+        <div class="form-item">
+          <label for="product3">产品编号3:</label>
+          <input type="text" id="product3" name="product3" v-model="product3" />
+        </div>
+        <div class="form-item">
+          <label for="product4">产品编号4:</label>
+          <input type="text" id="product4" name="product4" v-model="product4" />
+        </div>
+        <div class="form-item">
+          <label for="product5">产品编号5:</label>
+          <input type="text" id="product5" name="product5" v-model="product5" />
+        </div>
+
+        <div class="form-item">
+          <input type="checkbox" id="nl_en" name="nl_en" value="nl_en" />
+          <label for="nl_en"> 荷兰</label><br />
+          <input type="checkbox" id="cn_zh" name="cn_zh" value="cn_zh" />
+          <label for="cn_zh"> 中国</label><br />
+          <input type="checkbox" id="uk_en" name="uk_en" value="uk_en" />
+          <label for="uk_en">英国</label><br />
+          <input type="checkbox" id="it_it" name="it_it" value="it_it" />
+          <label for="it_it"> 意大利</label><br />
+          <input type="checkbox" id="de_de" name="de_de" value="de_de" />
+          <label for="de_de"> 德国</label><br />
+          <input type="checkbox" id="fr_fr" name="fr_fr" value="fr_fr" />
+          <label for="fr_fr"> 法国</label><br />
+          <input type="checkbox" id="us_en" name="us_en" value="us_en" />
+          <label for="us_en"> 美国</label><br />
+          <input type="checkbox" id="ca_en" name="ca_en" value="ca_en" />
+          <label for="ca_en"> 加拿大</label><br />
+          <input type="checkbox" id="au_en" name="au_en" value="au_en" />
+          <label for="au_en"> 澳大利亚</label><br />
+        </div>
+        <button v-on:click="onSubmit">加入购物车</button>
+        <br />
+        <div id="result"></div>
       </div>
-      <div class="form-item">
-        <input type="checkbox" id="nl_en" name="nl_en" value="nl_en" />
-        <label for="nl_en"> 荷兰</label><br />
-        <input type="checkbox" id="cn_zh" name="cn_zh" value="cn_zh" />
-        <label for="cn_zh"> 中国</label><br />
-        <input type="checkbox" id="uk_en" name="uk_en" value="uk_en" />
-        <label for="uk_en">英国</label><br />
-        <input type="checkbox" id="it_it" name="it_it" value="it_it" />
-        <label for="it_it"> 意大利</label><br />
-        <input type="checkbox" id="de_de" name="de_de" value="de_de" />
-        <label for="de_de"> 德国</label><br />
-        <input type="checkbox" id="fr_fr" name="fr_fr" value="fr_fr" />
-        <label for="fr_fr"> 法国</label><br />
-        <input type="checkbox" id="us_en" name="us_en" value="us_en" />
-        <label for="us_en"> 美国</label><br />
-        <input type="checkbox" id="ca_en" name="ca_en" value="ca_en" />
-        <label for="ca_en"> 加拿大</label><br />
-        <input type="checkbox" id="au_en" name="au_en" value="au_en" />
-        <label for="au_en"> 澳大利亚</label><br />
-      </div>
-      <button v-on:click="onSubmit">加入购物车</button>
     </div>
-
-    <br />
-    <div id="result"></div>
   </body>
 
   <script>
@@ -81,6 +126,10 @@
         cookie3: "",
         product1: "",
         product2: "",
+        product3: "",
+        product4: "",
+        product5: "",
+        datadome: "",
       },
       methods: {
         setCookies: (ev) => {
@@ -98,7 +147,7 @@
             alert(error);
           }
         },
-        onSubmit: (ev) => {
+        onSubmit: function (ev) {
           ev.stopPropagation();
           ev.preventDefault();
           document.getElementById("result").innerHTML = "";
@@ -109,14 +158,14 @@
             countries = [],
             cookies = [];
 
-          cookieEles.forEach((el) => {
-            if (el.value) {
-              cookies.push(el.value);
-            }
-          });
+          // cookieEles.forEach((el) => {
+          //   if (el.value) {
+          //     cookies.push(el.value);
+          //   }
+          // });
           productEles.forEach((el) => {
             if (el.value) {
-              products.push(el.value);
+              products.push(el.value.trim());
             }
           });
 
@@ -125,9 +174,12 @@
               countries.push(ele.value);
             }
           });
+
+          
           axios
             .post("/add-to-cart", {
-              cookies,
+              cookie: this.cookie1.trim(),
+              datadome: this.datadome.trim(),
               products,
               countries,
             })

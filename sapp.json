@@ -1,0 +1,106 @@
+[
+  {
+    "name": "Lindy迷你手提包",
+    "id": 403,
+    "colors": [
+      {
+        "spec_hash": "466d9340bc73857b1993e7276a0b57ef",
+        "spec_value": "[\"大象灰\"]",
+        "sku": "H079086CC18"
+      },
+      {
+        "spec_hash": "054c176ba54ba5dc7dd5a9be446f9177",
+        "spec_value": "[\"金色\"]",
+        "sku": "H079086CC37"
+      },
+      {
+        "spec_hash": "894ff43abe346149d8fd812a65b32f49",
+        "spec_value": "[\"黑色\"]",
+        "sku": "H079086CC89"
+      },
+      {
+        "spec_hash": "858fa745a9bb0115322c20154f8daf63",
+        "spec_value": "[\"琥珀黄\"]",
+        "sku": "H079086CC9D"
+      },
+      {
+        "spec_hash": "227c880282de462931b1c5f3838f832e",
+        "spec_value": "[\"心红色\"]",
+        "sku": "H079086CCS3"
+      },
+      {
+        "spec_hash": "a249c9ea9528c2a722d0762aee7823ab",
+        "spec_value": "[\"粉笔白\"]",
+        "sku": "H079086CC10"
+      }
+    ]
+  },
+  {
+    "name": "Roulis迷你肩背包",
+    "id": 347,
+    "colors": [
+      {
+        "text": "水泥灰",
+        "spec_hash": "f9fe9874a7e60b580d0b147218e8e35e"
+      },
+      {
+        "text": "琥珀黄",
+        "spec_hash": "0fedece2fd46b3551d9c8a7cfe9eda8d"
+      },
+      {
+        "text": "银莲花紫",
+        "spec_hash": "30976b1577a18fa0cd5c054b3c289c8b"
+      },
+      {
+        "text": "博斯普鲁斯海峡绿",
+        "spec_hash": "aa34c5cfc745ed4db176a2b3dd255e44"
+      },
+      {
+        "text": "蚱蜢绿",
+        "spec_hash": "af8f6ee8b0b4849f2848c81376cc28ed"
+      },
+      {
+        "text": "金色",
+        "spec_hash": "22a0da11178e659d25caf5af1bd4289a"
+      },
+      {
+        "text": "泻湖蓝",
+        "spec_hash": "10b5a6863987195a2fcda38961b3ad44"
+      },
+      {
+        "text": "杏绿色",
+        "spec_hash": "bf218d065321c7824f57ea7a2f4959bc"
+      },
+      {
+        "text": "珍珠灰",
+        "spec_hash": "7fea3c6f1e907e0761cc887d69eda800"
+      },
+      {
+        "text": "沥青灰",
+        "spec_hash": "741360212e5d0c98a089a6a53d03b96f"
+      },
+      {
+        "text": "午夜蓝",
+        "spec_hash": "654984ada09c98b082f5c1bdb1cc7a1c"
+      }
+    ]
+  },
+  {
+    "name": "Kelly Classique To Go钱包",
+    "id": 1140,
+    "colors": [
+      {
+        "text": "青柠色",
+        "spec_hash": "1f4a885f1af21d801a8be7d8f966b649"
+      },
+      {
+        "text": "干草色",
+        "spec_hash": "562269713c7d4f4411838bcc2c47e3d8"
+      },
+      {
+        "text": "黑色",
+        "spec_hash": "23972c1e3e70d5174e2f5edb81ab606f"
+      }
+    ]
+  }
+]
