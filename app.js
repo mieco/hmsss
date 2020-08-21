@@ -114,7 +114,9 @@ app.post("/add-to-cart", jsonParser, async (req, res) => {
 
     promise_results.forEach(({ rr, response,sku }) => {
 
+      
       if(rr.error) {
+        console.log(rr.error);
         res_results.push({
           success:false,
           sku,
@@ -122,12 +124,14 @@ app.post("/add-to-cart", jsonParser, async (req, res) => {
         })
       }else{
         if(typeof rr === "string") {
+          console.log(rr);
           res_results.push({
             success:false,
             sku,
             message: rr
           })
         }else{
+          console.log(rr);
           if(rr.url) {
             res_results.push({
               success:false,
