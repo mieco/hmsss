@@ -10,11 +10,12 @@ var cookieParser = require("cookie-parser");
 // const rp = request.defaults({ proxy: "http://180.141.90.145:53281" });
 // rey.RqLU8exfsfA
 // https://bck.hermes.cn/product-page?locale=au_en&productsku=H079103CCP9
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.resolve(__dirname,"dist")));
 app.use(cookieParser());
 var jsonParser = bodyParser.json();
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, index.html));
+  console.log(path.resolve(__dirname, "dist/index.html"));
+  res.sendFile(path.resolve(__dirname, "dist/index.html"));
 });
 
 app.post("/add-to-cart", jsonParser, async (req, res) => {
@@ -41,7 +42,7 @@ app.post("/add-to-cart", jsonParser, async (req, res) => {
 
   let req_cookie = `ECOM_SESS=${cookie};${datadome_cookies}`;
 
-  products.forEach((prod) => {
+  products.filter(p => p).forEach((prod) => {
     countries.forEach((country) => {
       all_req.push({
         cookie: req_cookie,
@@ -51,12 +52,12 @@ app.post("/add-to-cart", jsonParser, async (req, res) => {
     });
   });
 
-  console.log(JSON.stringify(all_req, null, 2));
-  let results = [],
+  // console.log(JSON.stringify(all_req, null, 2));
+  let promise_results = [],
     idx = 0;
   let reshtml = ``,
     success_str = "",
-    error_str = "";
+    error_str = "",res_results = [];
   try {
     await (async function () {
       for (let req of all_req) {
@@ -91,12 +92,13 @@ app.post("/add-to-cart", jsonParser, async (req, res) => {
                 resolve({
                   rr: res.body,
                   response: res,
+                  sku: req.prod
                 });
               }
             }
           );
         });
-        results.push(result);
+        promise_results.push(result);
 
         if (all_req[idx]) {
           await new Promise((resolve, reject) => {
@@ -110,29 +112,66 @@ app.post("/add-to-cart", jsonParser, async (req, res) => {
       }
     })();
 
-    results.forEach(({ rr, response }) => {
+    promise_results.forEach(({ rr, response,sku }) => {
 
-      if (rr.error) {
-        error_str += `<span style="color:#D84315;">加入失败！</span>  <strong> ${rr.error.item}</strong>  <span style="color:#D84315;">${rr.error.message} ${rr.error.code}</span><br>`;
-      } else {
-        if (typeof rr === "string") {
-          error_str+= `<span style="color:#D84315;">加入失败！</span> ${rr} <br>`
-        } else {
-          if (rr.url) {
-            // fs.writeFileSync("./auth.html", rr);
-            success_str += `<span style="color:#D84315;">加入失败！</span>需要验证! <br>`;
-          } else {
+      if(rr.error) {
+        res_results.push({
+          success:false,
+          sku,
+          message: rr.error.message + " " + rr.error.code
+        })
+      }else{
+        if(typeof rr === "string") {
+          res_results.push({
+            success:false,
+            sku,
+            message: rr
+          })
+        }else{
+          if(rr.url) {
+            res_results.push({
+              success:false,
+              sku,
+              message:"需要验证！"
+            })
+          }else{
             if (rr.basket && rr.basket.items && rr.basket.items[0]) {
-              success_str += `<span style="color:#00E676;">加入成功！</span> <strong>${rr.basket.items[0].sku}</strong> <br>`;
-            } else {
-              error_str += `<span style="color:#D84315;">加入失败！</span>购物车为空! <br>`;
+              res_results.push({
+                success:true,
+                sku,
+                message:"加入成功！"
+              })
+            }else{
+              res_results.push({
+                success:false,
+                sku,
+                message:"购物车为空！"
+              })
             }
           }
         }
       }
+
+      // if (rr.error) {
+      //   error_str += `<span style="color:#D84315;">加入失败！</span>  <strong> ${rr.error.item}</strong>  <span style="color:#D84315;">${rr.error.message} ${rr.error.code}</span><br>`;
+      // } else {
+      //   if (typeof rr === "string") {
+      //     error_str+= `<span style="color:#D84315;">加入失败！</span> ${rr} <br>`
+      //   } else {
+      //     if (rr.url) {
+      //       // fs.writeFileSync("./auth.html", rr);
+      //       success_str += `<span style="color:#D84315;">加入失败！</span>需要验证! <br>`;
+      //     } else {
+      //       if (rr.basket && rr.basket.items && rr.basket.items[0]) {
+      //         success_str += `<span style="color:#00E676;">加入成功！</span> <strong>${rr.basket.items[0].sku}</strong> <br>`;
+      //       } else {
+      //         error_str += `<span style="color:#D84315;">加入失败！</span>购物车为空! <br>`;
+      //       }
+      //     }
+      //   }
+      // }
     });
 
-    reshtml = success_str + error_str;
   } catch (error) {
      console.log(error);
     res.json({
@@ -140,7 +179,7 @@ app.post("/add-to-cart", jsonParser, async (req, res) => {
     });
   }
   res.json({
-    result: reshtml,
+    result: res_results,
   });
   return;
   // Promise.all(
