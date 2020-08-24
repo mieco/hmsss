@@ -6,11 +6,15 @@ const request = require("request");
 const userAgents = require("./userAgent");
 const fs = require("fs");
 var cookieParser = require("cookie-parser");
+
+const IPsUrl =
+  "http://dps.kdlapi.com/api/getdps?orderid=999670921031535&num=1&format=json";
 // request.defaults({ proxy: "http://127.0.0.1:1087" });
 // const rp = request.defaults({ proxy: "http://180.141.90.145:53281" });
 // rey.RqLU8exfsfA
 // https://bck.hermes.cn/product-page?locale=au_en&productsku=H079103CCP9
-app.use(express.static(path.resolve(__dirname,"dist")));
+//http://dps.kdlapi.com/api/getdps?orderid=999670921031535&num=5&format=json
+app.use(express.static(path.resolve(__dirname, "dist")));
 app.use(cookieParser());
 var jsonParser = bodyParser.json();
 app.get("/", (req, res) => {
@@ -42,26 +46,39 @@ app.post("/add-to-cart", jsonParser, async (req, res) => {
 
   let req_cookie = `ECOM_SESS=${cookie};${datadome_cookies}`;
 
-  products.filter(p => p).forEach((prod) => {
-    countries.forEach((country) => {
-      all_req.push({
-        cookie: req_cookie,
-        prod,
-        country,
+  products
+    .filter((p) => p)
+    .forEach((prod) => {
+      countries.forEach((country) => {
+        all_req.push({
+          cookie: req_cookie,
+          prod,
+          country,
+        });
       });
     });
-  });
 
   // console.log(JSON.stringify(all_req, null, 2));
   let promise_results = [],
     idx = 0;
   let reshtml = ``,
     success_str = "",
-    error_str = "",res_results = [];
+    error_str = "",
+    res_results = [];
   try {
     await (async function () {
       for (let req of all_req) {
         idx++;
+        let ip = await new Promise((resolve, reject) => {
+          request.get(IPsUrl, (err, res) => {
+            if (err) {
+              resolve(false);
+            } else {
+              resolve(res.body.data.proxy_list[0] || false);
+            }
+          });
+        });
+        console.log(ip);
         let result = await new Promise((resolve, reject) => {
           let userAgent =
             userAgents[parseInt(Math.random() * userAgents.length)];
@@ -70,7 +87,8 @@ app.post("/add-to-cart", jsonParser, async (req, res) => {
             {
               headers: {
                 cookie: req.cookie,
-                "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36",
+                "user-agent":
+                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36",
                 accept: "application/json, text/plain, */*",
                 Origin: "https://www.hermes.com",
               },
@@ -84,6 +102,7 @@ app.post("/add-to-cart", jsonParser, async (req, res) => {
                 ],
               },
               json: true,
+              proxy: ip || null,
             },
             (err, res) => {
               if (err) {
@@ -92,7 +111,7 @@ app.post("/add-to-cart", jsonParser, async (req, res) => {
                 resolve({
                   rr: res.body,
                   response: res,
-                  sku: req.prod
+                  sku: req.prod,
                 });
               }
             }
@@ -108,49 +127,46 @@ app.post("/add-to-cart", jsonParser, async (req, res) => {
             }, time);
           });
         }
-
       }
     })();
 
-    promise_results.forEach(({ rr, response,sku }) => {
-
-      
-      if(rr.error) {
+    promise_results.forEach(({ rr, response, sku }) => {
+      if (rr.error) {
         console.log(rr.error);
         res_results.push({
-          success:false,
+          success: false,
           sku,
-          message: rr.error.message + " " + rr.error.code
-        })
-      }else{
-        if(typeof rr === "string") {
+          message: rr.error.message + " " + rr.error.code,
+        });
+      } else {
+        if (typeof rr === "string") {
           console.log(rr);
           res_results.push({
-            success:false,
+            success: false,
             sku,
-            message: rr
-          })
-        }else{
+            message: rr,
+          });
+        } else {
           console.log(rr);
-          if(rr.url) {
+          if (rr.url) {
             res_results.push({
-              success:false,
+              success: false,
               sku,
-              message:"需要验证！"
-            })
-          }else{
+              message: "需要验证！",
+            });
+          } else {
             if (rr.basket && rr.basket.items && rr.basket.items[0]) {
               res_results.push({
-                success:true,
+                success: true,
                 sku,
-                message:"加入成功！"
-              })
-            }else{
+                message: "加入成功！",
+              });
+            } else {
               res_results.push({
-                success:false,
+                success: false,
                 sku,
-                message:"购物车为空！"
-              })
+                message: "购物车为空！",
+              });
             }
           }
         }
@@ -175,9 +191,8 @@ app.post("/add-to-cart", jsonParser, async (req, res) => {
       //   }
       // }
     });
-
   } catch (error) {
-     console.log(error);
+    console.log(error);
     res.json({
       error: error.message,
     });
